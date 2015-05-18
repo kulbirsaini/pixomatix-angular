@@ -17,7 +17,7 @@ Config File : `config/pixomatix.yml`
 ```ruby
 default: &default
   thumbnail_width: 200
-  api_url: 'http://demo.pixomatix.com/api' # API to use to show galleries and images. Should be either blank or URL.
+  api_url: 'http://demo.pixomatix.com/api' # URL to Pixomatix-Api
   api_version: 'v1'
 
 development:
