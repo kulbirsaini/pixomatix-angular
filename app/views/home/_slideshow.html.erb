@@ -14,7 +14,7 @@
     <div class="thumbnails">
         <ul class="nav" ng-style="{ 'left': leftOffset }">
           <li ng-repeat="image in images">
-          <img ng-src="{{image.thumbnail_path}}" class="thumbnail" ng-class="{ 'active': $index == currentIndex }" ng-click="goToImageAtIndex($index)" />
+          <img ng-src="{{image.thumbnail_url}}" class="thumbnail" ng-class="{ 'active': $index == currentIndex }" ng-click="goToImageAtIndex($index)" />
           </li>
         </ul>
     </div>
@@ -34,9 +34,9 @@
             <form class="form-inline">
               <div class="form-group">
                 Picture Quality <select class="form-control input-sm" ng-model="quality">
-                  <option value="thumbnail_path">Thumbnail</option>
-                  <option value="hdtv_path">HDTV</option>
-                  <option value="original_path">Original</option>
+                  <option value="thumbnail_url">Thumbnail</option>
+                  <option value="hdtv_url">HDTV</option>
+                  <option value="original_url">Original</option>
                 </select>
               </div>
             </form>

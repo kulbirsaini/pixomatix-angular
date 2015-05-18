@@ -27,7 +27,7 @@ galleryControllers.controller('GalleryCtrl', ['$scope', '$routeParams', '$filter
           Gallery.getCollection({operation: 'galleries', id: data.id}, $scope.appendToGalleries);
         }
         if (data.has_images){
-          $scope.galleries = $scope.galleries.concat({id:data.id,is_image:false,is_gallery:true,has_galleries:false,has_images:true,has_parent:true,parent_id:data.id,thumbnail_path:data.thumbnail_path});
+          $scope.galleries = $scope.galleries.concat({id:data.id,is_image:false,is_gallery:true,has_galleries:false,has_images:true,has_parent:true,parent_id:data.id,thumbnail_url:data.thumbnail_url});
         }
       }
     };
