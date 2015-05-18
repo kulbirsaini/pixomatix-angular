@@ -51,7 +51,7 @@ galleryControllers.controller('SlideshowCtrl', ['$scope', '$route', '$routeParam
       $scope.currentAngle = 0;
       $scope.rotatedWidth = null;
       $scope.images = [];
-      $scope.quality = 'hdtv_path';
+      $scope.quality = 'hdtv_url';
       $scope.circular = 'no';
       $scope.fadeOutTime = 300;
       $scope.leftOffset = '0px';
