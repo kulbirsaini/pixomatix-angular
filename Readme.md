@@ -6,7 +6,7 @@
 
 Pixomatix-Angular is an [Angularjs](https://angularjs.org/) (1.3) powered front-end for Pixomatix-API.
 
-**Demo** : [demo.pixomatix.com](http://demo.pixomatix.com/)
+**Demo** : [angular.pixomatix.com](http://angular.pixomatix.com/)
 
 ## Configuration
 
