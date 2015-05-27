@@ -61,6 +61,11 @@ galleryControllers.controller('SlideshowCtrl', ['$scope', '$route', '$routeParam
       $scope.loading = true;
     };
 
+    $scope.isDownloadable = function(){
+      var current_image = $scope.getCurrentImage();
+      return current_image && current_image.download_url;
+    };
+
     $scope.getBodyWidth = function(){
       return jQuery(window).width();
     };

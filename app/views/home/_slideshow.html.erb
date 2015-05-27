@@ -56,7 +56,7 @@
           </ul>
         </div>
         <%= button_tag('', 'ng-click': 'redirectToParentGallery()', class: 'btn btn-warning'){ content_tag(:span, '', class: 'glyphicon glyphicon-remove-circle') } %>
-        <%= link_to(content_tag(:span, '', class: 'glyphicon glyphicon-download'), '/images/{{getCurrentImage().id}}/download', class: 'btn btn-warning') %>
+        <%= link_to(content_tag(:span, '', class: 'glyphicon glyphicon-download'), '{{getCurrentImage().download_url}}', class: 'btn btn-warning', 'ng-hide': '!isDownloadable()') %>
         <%= button_tag('', 'ng-click': 'rotateClockwise()', class: 'btn btn-warning'){ content_tag(:span, '', class: 'glyphicon glyphicon-repeat') } %>
         <%= button_tag('', 'ng-click': 'goToNextImage()', class: 'btn btn-warning', 'ng-disabled': "isNextButtonDisabled()"){ content_tag(:span, '', class: 'glyphicon glyphicon-forward') } %>
         <%= button_tag('', 'ng-click': 'goToLastImage()', class: 'btn btn-warning', 'ng-disabled': "isLastButtonDisabled()"){ content_tag(:span, '', class: 'glyphicon glyphicon-fast-forward') } %>
