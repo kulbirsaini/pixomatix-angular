@@ -12,27 +12,20 @@ Pixomatix-Angular is an [Angularjs](https://angularjs.org/) (1.3) powered front-
 
 ### App Configuration
 
-Config File : `config/pixomatix.yml`
+Config File : `app/assets/js/constants.js`
 
-```ruby
-default: &default
-  thumbnail_width: 200
-  api_url: 'http://demo.pixomatix.com/api' # URL to Pixomatix-Api
+```javascript
+// Configuration for development environment
+angular.module("PixomatixConfig.development", []).constant('Config', {
+  api_url: 'http://localhost:1234/api', // URL to API
+  api_version: 'v1'                    // API Version
+});
+
+// Configuration for production environment
+angular.module("PixomatixConfig.production", []).constant('Config', {
+  api_url: 'http://api.pixomatix.com/api',
   api_version: 'v1'
-
-development:
-  <<: *default
-  api_url: 'http://localhost:1234/api'
-  api_version: 'v1'
-
-test:
-  <<: *default
-
-stage:
-  <<: *default
-
-production:
-  <<: *default
+});
 ```
 
 ## About Me
