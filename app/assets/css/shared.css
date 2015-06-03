@@ -1,0 +1,30 @@
+.hidden {
+  display: none; }
+
+div.top-buffer {
+  margin-top: 20px; }
+
+div.bottom-buffer {
+  margin-bottom: 20px; }
+
+img.img-center {
+  margin: 0 auto; }
+
+header {
+  background: #555; }
+  header a {
+    color: #eee; }
+  header a:hover, header a:focus {
+    color: #555; }
+  header .navbar-brand {
+    font-size: 20px; }
+  header .navbar-brand:hover, header .navbar-brand:focus {
+    background: white; }
+  header .navbar-toggle .icon-bar {
+    background: white;
+    display: block;
+    width: 22px;
+    height: 2px;
+    border-radius: 1px; }
+
+/*# sourceMappingURL=shared.css.map */
