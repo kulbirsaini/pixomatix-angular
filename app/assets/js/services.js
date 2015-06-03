@@ -1,10 +1,9 @@
-var galleryServices = angular.module("galleryServices", ['ngResource']);
+var PixomatixServices = angular.module("PixomatixServices", []);
 
-galleryServices.factory("Gallery", ["$resource", "$routeParams",
-  function($resouce, $routeParams){
-    //TODO FIXME
-    var headers = { 'Accept' : "application/vnd.pixomatix.v1" };
-    var resource = $resouce("http://localhost:1234/api/galleries/:id/:operation.json", { id: '@id' }, {
+PixomatixServices.factory("Gallery", ["$resource", "$routeParams", "Config",
+  function($resouce, $routeParams, Config){
+    var headers = { 'Accept' : "application/vnd.pixomatix." + Config.api_version };
+    var resource = $resouce(Config.api_url + "/galleries/:id/:operation.json", { id: '@id' }, {
       get: { method: 'GET', isArray: false, headers: headers },
       query: { method: 'GET', isArray: true, headers: headers }
     });
@@ -21,7 +20,7 @@ galleryServices.factory("Gallery", ["$resource", "$routeParams",
   }
 ]);
 
-galleryServices.factory("CurrentUser", ["$cookies", "Auth",
+PixomatixServices.factory("CurrentUser", ["$cookies", "Auth",
   function($cookies, Auth){
     return {
       get: function(){
@@ -40,10 +39,9 @@ galleryServices.factory("CurrentUser", ["$cookies", "Auth",
   }
 ]);
 
-galleryServices.factory("Auth", ["$resource", "$cookies",
-  function($resource, $cookies){
-    //TODO FIXME
-    var default_headers = { 'Accept' : "application/vnd.pixomatix.v1" };
+PixomatixServices.factory("Auth", ["$resource", "$cookies", "Config",
+  function($resource, $cookies, Config){
+    var default_headers = { 'Accept' : "application/vnd.pixomatix." + Config.api_version };
 
     var resource_with_headers = function(headers){
       if (typeof(headers) === "undefined"){
@@ -52,8 +50,7 @@ galleryServices.factory("Auth", ["$resource", "$cookies",
           headers = angular.extend({}, { 'X-Access-Email': current_user.email, 'X-Access-Token' : current_user.token });
         }
       }
-      //TODO FIXME
-      var resource = $resource("http://localhost:1234/api/auth/:operation", {}, {
+      var resource = $resource(Config.api_url + "/auth/:operation", {}, {
         get: { method: 'GET', headers: angular.extend(default_headers, headers) },
         post: { method: 'POST', headers: angular.extend(default_headers, headers) },
         put: { method: 'PUT', headers: angular.extend(default_headers, headers) },
@@ -111,7 +108,7 @@ galleryServices.factory("Auth", ["$resource", "$cookies",
   }
 ]);
 
-galleryServices.service('Settings', ['Gallery',
+PixomatixServices.service('Settings', ['Gallery',
   function(Gallery){
     this.settings = {}
 

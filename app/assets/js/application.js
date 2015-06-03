@@ -1,13 +1,15 @@
-var galleryApp = angular.module("GalleryApp", [
+var Pixomatix = angular.module("Pixomatix", [
+  'ngResource',
   'ngRoute',
   'ngTouch',
   'ngCookies',
-  'galleryControllers',
-  'galleryServices',
-  'galleryDirectives',
+  'PixomatixControllers',
+  'PixomatixServices',
+  'PixomatixDirectives',
+  'PixomatixConfig.development',
 ]);
 
-galleryApp.config(['$routeProvider',
+Pixomatix.config(['$routeProvider',
   function($routeProvider){
     $routeProvider.
     when('/gallery/:id/slideshow/:image_id', {
@@ -32,7 +34,7 @@ galleryApp.config(['$routeProvider',
   }
 ]);
 
-galleryApp.run(['$rootScope', '$document',
+Pixomatix.run(['$rootScope', '$document',
   function($rootScope, $document){
     var handleKeyDown = function(event){
       $rootScope.$apply(function(){
@@ -66,5 +68,5 @@ galleryApp.run(['$rootScope', '$document',
 ]);
 
 jQuery(document).on('ready page:load', function(arguments){
-  angular.bootstrap(document.body, ['GalleryApp'])
+  angular.bootstrap(document.body, ['Pixomatix'])
 });

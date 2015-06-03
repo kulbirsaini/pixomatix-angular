@@ -1,6 +1,6 @@
-var galleryDirectives = angular.module('galleryDirectives', []);
+var PixomatixDirectives = angular.module('PixomatixDirectives', []);
 
-galleryDirectives.directive('imageonload', function(){
+PixomatixDirectives.directive('imageonload', function(){
   return {
     restrict: 'A',
     link: function(scope, element, attrs){

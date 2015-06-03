@@ -1,6 +1,6 @@
-var galleryControllers = angular.module("galleryControllers", []);
+var PixomatixControllers = angular.module("PixomatixControllers", []);
 
-galleryControllers.controller('GalleryCtrl', ['$scope', '$routeParams', '$filter', '$cookies', 'Gallery', 'Auth', 'CurrentUser',
+PixomatixControllers.controller('GalleryCtrl', ['$scope', '$routeParams', '$filter', '$cookies', 'Gallery', 'Auth', 'CurrentUser',
   function($scope, $routeParams, $filter, $cookies, Gallery, Auth, CurrentUser){
     $scope.initializeData = function(){
       $scope.galleries = [];
@@ -50,7 +50,7 @@ galleryControllers.controller('GalleryCtrl', ['$scope', '$routeParams', '$filter
   }
 ]);
 
-galleryControllers.controller('SlideshowCtrl', ['$scope', '$route', '$routeParams', '$location', '$timeout', 'Gallery', 'Settings',
+PixomatixControllers.controller('SlideshowCtrl', ['$scope', '$route', '$routeParams', '$location', '$timeout', 'Gallery', 'Settings',
   function($scope, $route, $routeParams, $location, $timeout, Gallery, Settings){
     $scope.initializeData = function(){
       $scope.gallery_id = $routeParams.id;
