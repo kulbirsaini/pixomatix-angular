@@ -28,12 +28,20 @@ PixomatixServices.factory("CurrentUser", ["$cookies", "Auth",
         return (typeof(current_user) === "undefined") ? {} : current_user;
       },
 
+      set: function(email, token){
+        $cookies.putObject('current_user', { email: email, token: token });
+      },
+
+      reset: function(){
+        $cookies.remove('current_user');
+      },
+
       loggedIn: function(){
         var current_user = this.get();
         if (typeof(current_user.email) === "undefined" || typeof(current_user.token) === "undefined"){
           return false;
         }
-        Auth().validate().$promise.then(function(){ console.log(true); }).catch(function(){ console.log(false); });
+        return true;
       },
     };
   }
@@ -44,12 +52,14 @@ PixomatixServices.factory("Auth", ["$resource", "$cookies", "Config",
     var default_headers = { 'Accept' : "application/vnd.pixomatix." + Config.api_version };
 
     var resource_with_headers = function(headers){
-      if (typeof(headers) === "undefined"){
-        var current_user = $cookies.getObject('current_user');
-        if (typeof(current_user) !== "undefined"){
-          headers = angular.extend({}, { 'X-Access-Email': current_user.email, 'X-Access-Token' : current_user.token });
-        }
+      var current_user = $cookies.getObject('current_user');
+
+      if (typeof(headers) === "undefined"){ headers = {}; }
+
+      if (current_user && current_user.email && current_user.token){
+        headers = angular.extend(headers, { 'X-Access-Email': current_user.email, 'X-Access-Token' : current_user.token });
       }
+
       var resource = $resource(Config.api_url + "/auth/:operation", {}, {
         get: { method: 'GET', headers: angular.extend(default_headers, headers) },
         post: { method: 'POST', headers: angular.extend(default_headers, headers) },
@@ -62,7 +72,7 @@ PixomatixServices.factory("Auth", ["$resource", "$cookies", "Config",
       };
 
       resource.login = function(params, data, success, failure){
-        return this.post({ operation: 'login' }, data, success, failure).$promise.then(function(response){ console.log(response); $cookies.putObject('current_user', { email: response.user.email, token: response.token }); });;
+        return this.post({ operation: 'login' }, data, success, failure);
       };
 
       resource.user = function(params, success, failure){
@@ -102,26 +112,28 @@ PixomatixServices.factory("Auth", ["$resource", "$cookies", "Config",
       };
 
       return resource;
-    }
+    };
 
     return resource_with_headers;
   }
 ]);
 
-PixomatixServices.service('Settings', ['Gallery',
-  function(Gallery){
-    this.settings = {}
+PixomatixServices.service('SharedState', [
+  function(){
+    this.state= {};
 
-    this.reset = function(){
-      this.settings = {};
+    this.reset = function(namespace){
+      this.state[namespace] = {};
     };
 
-    this.setValue = function(variable, values){
-      this.settings[variable] = values;
+    this.setValue = function(namespace, variable, values){
+      if (typeof(this.state[namespace]) === "undefined"){ this.state[namespace] = {}; }
+      this.state[namespace][variable] = values;
     };
 
-    this.getValue = function(variable){
-      return this.settings[variable];
+    this.getValue = function(namespace, variable){
+      if (typeof(this.state[namespace]) === "undefined"){ this.state[namespace] = {}; }
+      return this.state[namespace][variable];
     };
   }
 ]);

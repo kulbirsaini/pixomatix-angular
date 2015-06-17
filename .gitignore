@@ -1,11 +1,18 @@
-.*.sw*
-.idea
-.DS_Store
 .sass-cache/
-npm-debug.log
 logs/*
-node_modules/
-app/components/
 tmp/
 test/
 !.gitkeep
+
+# Node
+node_modules/
+npm-debug.log
+
+# Bower
+/app/bower_components/
+/app/assets/css/*
+!/app/assets/css/.keep
+/app/assets/fonts/*
+!/app/assets/fonts/.keep
+/app/assets/minjs/*
+!/app/assets/minjs/.keep

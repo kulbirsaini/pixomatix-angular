@@ -1,10 +1,202 @@
 var PixomatixControllers = angular.module("PixomatixControllers", []);
 
-PixomatixControllers.controller('GalleryCtrl', ['$scope', '$routeParams', '$filter', '$cookies', 'Gallery', 'Auth', 'CurrentUser',
-  function($scope, $routeParams, $filter, $cookies, Gallery, Auth, CurrentUser){
+PixomatixControllers.controller('BodyCtrl', ['$scope', '$location', 'CurrentUser', 'SharedState',
+  function($scope, $location, CurrentUser, SharedState){
+    $scope.CurrentUser = CurrentUser;
+    $scope.SharedState = SharedState;
+
+    $scope.logout = function(){
+      SharedState.setValue('user', 'after_login_path', $location.path());
+      $location.path('/auth/logout');
+    };
+  }
+]);
+
+PixomatixControllers.controller('LogoutCtrl', ['$scope', '$location', 'Auth', 'CurrentUser', 'SharedState',
+  function($scope, $location, Auth, CurrentUser, SharedState){
+    if (CurrentUser.loggedIn()){
+      Auth().logout().
+      $promise.then(function(data){
+        console.log(data);
+        SharedState.setValue('auth', 'notice', data.notice);
+        CurrentUser.reset();
+        $location.path('/auth/login');
+      }).
+      catch(function(error){
+        console.log(error);
+        if (typeof(error.data.notice) !== "undefined"){
+          SharedState.setValue('auth', 'error', error.data.notice);
+          if (typeof(error.data.error) !== "undefined"){
+            SharedState.setValue('auth', 'warning', error.data.error);
+          }
+        } else {
+          SharedState.setValue('auth', 'error', 'Unknown error');
+        }
+        $scope.errors = SharedState.getValue('auth', 'error');
+        $scope.warnings = SharedState.getValue('auth', 'warning');
+        $scope.notices = SharedState.getValue('auth', 'notice');
+        SharedState.reset('auth');
+        if ($scope.errors && $scope.errors.constructor !== Array){ $scope.errors = [$scope.errors]; }
+        if ($scope.warnings && $scope.warnings.constructor !== Array){ $scope.warnings = [$scope.warnings]; }
+        if ($scope.notices && $scope.notices.constructor !== Array){ $scope.notices = [$scope.notices]; }
+      });
+    } else {
+      $location.path('/auth/login');
+    }
+  }
+]);
+
+PixomatixControllers.controller('AuthCtrl', ['$scope', '$route', '$routeParams', '$cookies', '$location', 'SharedState', 'Auth', 'CurrentUser',
+  function($scope, $route, $routeParams, $cookies, $location, SharedState, Auth, CurrentUser){
+    $scope.initializeData = function(){
+      SharedState.setValue('config', 'hideHeader', false);
+      SharedState.setValue('config', 'bodyClass', 'auth');
+      $scope.setAlerts();
+      console.log($cookies.getAll());
+    };
+
+    $scope.setAlerts = function(){
+      $scope.errors = SharedState.getValue('auth', 'error');
+      $scope.warnings = SharedState.getValue('auth', 'warning');
+      $scope.notices = SharedState.getValue('auth', 'notice');
+      SharedState.reset('auth');
+      if ($scope.errors && $scope.errors.constructor !== Array){ $scope.errors = [$scope.errors]; }
+      if ($scope.warnings && $scope.warnings.constructor !== Array){ $scope.warnings = [$scope.warnings]; }
+      if ($scope.notices && $scope.notices.constructor !== Array){ $scope.notices = [$scope.notices]; }
+    };
+
+    $scope.errorHandler = function(error){
+      console.log(error);
+      if (typeof(error.data.notice) !== "undefined"){
+        SharedState.setValue('auth', 'error', error.data.notice);
+        if (typeof(error.data.error) !== "undefined"){
+          SharedState.setValue('auth', 'warning', error.data.error);
+        }
+      } else {
+        SharedState.setValue('auth', 'error', 'Unknown error');
+      }
+      $scope.setAlerts();
+    };
+
+    $scope.successHandler = function(data, path){
+      console.log(data);
+      SharedState.setValue('auth', 'notice', data.notice);
+      if(!path){ path = '/'; }
+      $location.path(path);
+    };
+
+    $scope.setUserEmail = function(){
+      $cookies.put('user_email', $scope.email);
+    };
+
+    $scope.getEmail = function(){
+      var current_user = $cookies.getObject('current_user');
+      if (current_user && current_user.email){ return current_user.email; }
+
+      var user_email = $cookies.get('user_email');
+      if (user_email){ return user_email; }
+
+      if ($scope.email){ return $scope.email; }
+      return null;
+    };
+
+    $scope.removeUserEmail = function(){
+      $cookies.remove('user_email');
+    };
+
+    $scope.isEmailSet = function(){
+      return !!$scope.getEmail();
+    };
+
+    $scope.register = function(){
+      CurrentUser.reset();
+      Auth().register({}, { user: { name: $scope.name, email: $scope.email, password: $scope.password, password_confirmation: $scope.password_confirmation } }).
+      $promise.then(function(data){
+        $scope.setUserEmail();
+        $scope.successHandler(data, '/auth/confirm');
+      }).
+      catch($scope.errorHandler);
+    };
+
+    $scope.login = function(){
+      Auth().login({}, { user: { email: $scope.email, password: $scope.password } }).
+      $promise.then(function(data){
+        CurrentUser.set(data.user.email, data.token);
+        var path = SharedState.getValue('user', 'after_login_path');
+        SharedState.setValue('user', 'after_login_path', null);
+        if (path && path === '/auth/login'){ path = '/'; }
+        $scope.successHandler(data, path);
+      }).
+      catch($scope.errorHandler);
+    };
+
+    $scope.reset_password_instructions = function(){
+      Auth({ 'X-Access-Email' : $scope.email }).reset_password_instructions().
+      $promise.then(function(data){
+        $scope.setUserEmail();
+        $scope.successHandler(data, '/auth/reset-password');
+      }).
+      catch($scope.errorHandler);
+    };
+
+    $scope.reset_password = function(){
+      Auth({ 'X-Access-Email': $scope.getEmail(), 'X-Access-Reset-Password-Token': $scope.reset_password_token }).
+      reset_password({}, { user: { password: $scope.password, password_confirmation: $scope.password_confirmation } }).
+      $promise.then(function(data){
+        $scope.removeUserEmail();
+        $scope.successHandler(data, '/auth/login');
+      }).
+      catch($scope.errorHandler);
+    };
+
+    $scope.unlock_instructions = function(){
+      Auth({ 'X-Access-Email' : $scope.email }).unlock_instructions().
+      $promise.then(function(data){
+        $scope.setUserEmail();
+        $scope.successHandler(data, '/auth/unlock');
+      }).
+      catch($scope.errorHandler);
+    };
+
+    $scope.unlock = function(){
+      Auth({ 'X-Access-Email': $scope.getEmail(), 'X-Access-Unlock-Token': $scope.unlock_token }).
+      reset_password().
+      $promise.then(function(data){
+        $scope.removeUserEmail();
+        $scope.successHandler(data, '/auth/login');
+      }).
+      catch($scope.errorHandler);
+    };
+
+    $scope.confirmation_instructions = function(){
+      Auth({ 'X-Access-Email' : $scope.email }).confirmation_instructions().
+      $promise.then(function(data){
+        $scope.setUserEmail();
+        $scope.successHandler(data, '/auth/confirm');
+      }).
+      catch($scope.errorHandler);
+    };
+
+    $scope.confirm = function(){
+      Auth({ 'X-Access-Email': $scope.getEmail(), 'X-Access-Confirmation-Token': $scope.confirmation_token }).confirm().
+      $promise.then(function(data){
+        $scope.removeUserEmail();
+        $scope.successHandler(data, '/auth/login');
+      }).
+      catch($scope.errorHandler);
+    };
+
+    $scope.initializeData();
+  }
+]);
+
+PixomatixControllers.controller('GalleryCtrl', ['$scope', '$routeParams', '$filter', '$cookies', '$location', 'Gallery', 'Auth', 'CurrentUser', 'SharedState',
+  function($scope, $routeParams, $filter, $cookies, $location, Gallery, Auth, CurrentUser, SharedState){
     $scope.initializeData = function(){
       $scope.galleries = [];
       $scope.parent_id = null;
+      SharedState.setValue('config', 'hideHeader', false);
+      SharedState.setValue('config', 'bodyClass', 'gallery');
     };
 
     $scope.filterEmptyGalleries = function(galleries){
@@ -17,7 +209,7 @@ PixomatixControllers.controller('GalleryCtrl', ['$scope', '$routeParams', '$filt
     };
 
     $scope.handleData = function(data){
-      console.log('id: ', $routeParams.id, ' data: ', data, ' constructor: ', data.constructor === Array);
+      console.log(data);
       $scope.initializeData();
       if (data.constructor === Array){
         $scope.appendToGalleries(data);
@@ -42,16 +234,21 @@ PixomatixControllers.controller('GalleryCtrl', ['$scope', '$routeParams', '$filt
     };
 
     $scope.initializeData();
-    if (typeof($routeParams.id) == "undefined"){
-      Gallery.query($scope.handleData);
+    if (CurrentUser.loggedIn()) {
+      if (typeof($routeParams.id) == "undefined"){
+        Gallery.query($scope.handleData);
+      } else {
+        Gallery.get({id: $routeParams.id}, $scope.handleData);
+      }
     } else {
-      Gallery.get({id: $routeParams.id}, $scope.handleData);
+      SharedState.setValue('user', 'after_login_path', $location.path());
+      $location.path('/auth/login');
     }
   }
 ]);
 
-PixomatixControllers.controller('SlideshowCtrl', ['$scope', '$route', '$routeParams', '$location', '$timeout', 'Gallery', 'Settings',
-  function($scope, $route, $routeParams, $location, $timeout, Gallery, Settings){
+PixomatixControllers.controller('SlideshowCtrl', ['$scope', '$route', '$routeParams', '$location', '$timeout', 'Gallery', 'CurrentUser', 'SharedState',
+  function($scope, $route, $routeParams, $location, $timeout, Gallery, CurrentUser, SharedState){
     $scope.initializeData = function(){
       $scope.gallery_id = $routeParams.id;
       $scope.image_id = $routeParams.image_id;
@@ -68,6 +265,8 @@ PixomatixControllers.controller('SlideshowCtrl', ['$scope', '$route', '$routePar
       $scope.thumbnail_width = 105; //with margin/padding
       $scope.slide_height_padding = 150; //with margin/padding
       $scope.loading = true;
+      SharedState.setValue('config', 'hideHeader', true);
+      SharedState.setValue('config', 'bodyClass', 'slideshow');
     };
 
     $scope.isDownloadable = function(){
@@ -269,8 +468,8 @@ PixomatixControllers.controller('SlideshowCtrl', ['$scope', '$route', '$routePar
       $scope.setRotatedWidth();
     });
     $scope.$watch("currentIndex", function(value){ $scope.currentAngle = 0; $scope.setLeftOffset(); });
-    $scope.$watch("circular", function(value){ Settings.setValue('circular', value); });
-    $scope.$watch("quality", function(value){ Settings.setValue('quality', value); });
+    $scope.$watch("circular", function(value){ SharedState.setValue('slideshow', 'circular', value); });
+    $scope.$watch("quality", function(value){ SharedState.setValue('slideshow', 'quality', value); });
 
     // Monitor window resize
     jQuery(window).on('resize.doResize', function(){
@@ -281,7 +480,7 @@ PixomatixControllers.controller('SlideshowCtrl', ['$scope', '$route', '$routePar
         $scope.setRotatedWidth();
         $scope.setLeftOffset();
         current_image.show();
-      })
+      });
     });
     $scope.$on("$destroy", function(){ jQuery(window).off('resize.doResize'); });
 
@@ -289,11 +488,16 @@ PixomatixControllers.controller('SlideshowCtrl', ['$scope', '$route', '$routePar
     $scope.$on("$locationChangeSuccess", function(event){ if ($route.current.$$route.controller == 'SlideshowCtrl'){ $route.current = $scope.lastRoute; } });
 
     $scope.initializeData();
-    Gallery.getObject({ operation: 'parent', id: $scope.gallery_id }, function(data){ $scope.parent_id = data.parent_id; });
-    Gallery.getCollection({ operation: 'photos', id: $scope.gallery_id }, $scope.appendToImages)
-    if (typeof(Settings.getValue('quality')) !== "undefined"){
-      $scope.circular = Settings.getValue('circular');
-      $scope.quality = Settings.getValue('quality');
+    if (CurrentUser.loggedIn()){
+      Gallery.getObject({ operation: 'parent', id: $scope.gallery_id }, function(data){ $scope.parent_id = data.parent_id; });
+      Gallery.getCollection({ operation: 'photos', id: $scope.gallery_id }, $scope.appendToImages);
+      if (typeof(SharedState.getValue('slideshow', 'quality')) !== "undefined"){
+        $scope.circular = SharedState.getValue('slideshow', 'circular');
+        $scope.quality = SharedState.getValue('slideshow', 'quality');
+      }
+    } else{
+      SharedState.setValue('user', 'after_login_path', $location.path());
+      $location.path('/auth/login');
     }
   }
 ]);

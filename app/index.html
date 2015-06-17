@@ -14,21 +14,18 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <link rel="stylesheet" href="assets/css/application.css">
-    <script src="components/angular/angular.min.js"></script>
-    <script src="components/angular-animate/angular-animate.min.js"></script>
-    <script src="components/angular-touch/angular-touch.min.js"></script>
-    <script src="components/angular-route/angular-route.min.js"></script>
-    <script src="components/angular-cookies/angular-cookies.min.js"></script>
-    <script src="components/angular-resource/angular-resource.min.js"></script>
-    <script src="components/jquery/dist/jquery.min.js"></script>
-    <script src="components/bootstrap-sass/assets/javascripts/bootstrap.min.js"></script>
-    <script src="assets/js/application.js"></script>
-    <script src="assets/js/controllers.js"></script>
-    <script src="assets/js/services.js"></script>
-    <script src="assets/js/directives.js"></script>
-    <script src="assets/js/constants.js"></script>
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+    <script src="bower_components/angular-touch/angular-touch.min.js"></script>
+    <script src="bower_components/angular-route/angular-route.min.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.min.js"></script>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.min.js"></script>
+    <script src="assets/minjs/application.min.js"></script>
   </head>
-  <body>
-    <div ng-view></div>
+  <body ng-controller="BodyCtrl" class="{{SharedState.getValue('config', 'bodyClass')}}">
+    <header ng-hide="SharedState.getValue('config', 'hideHeader')" ng-include="'partials/shared/navigation.html'" class="navbar navbar-static-top" id="top" role="banner"></header>
+    <div ng-view class="content-container"></div>
   </body>
 </html>

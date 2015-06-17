@@ -1,0 +1,40 @@
+<div class="container-fluid">
+  <div class="row devise-box">
+    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 column">
+      <h2 class="text-center">Pixomatix</h2>
+
+      <form class="form-horizontal login-form" novalidate="novalidate">
+        <fieldset>
+          <div ng-include="'partials/auth/notice.html'"></div>
+
+          <div class="form-group required">
+            <input class="required input-lg form-control round-top-corner" autofocus="autofocus" placeholder="Email" type="email" name="email" ng-model="email">
+          </div>
+          <div class="form-group required">
+            <input class="required input-lg form-control round-bottom-corner" placeholder="Password" type="password" name="password" ng-model="password">
+          </div>
+
+          <a class="forgot-password" href="#/auth/request-new-password">Forgot your password?</a>
+
+          <a class="btn btn-danger btn-sign-in" ng-click="login()">Login</a>
+
+          <div class="line-through">
+            <span>or</span>
+          </div>
+
+          <a class="btn btn-success btn-sign-up" href="#/auth/register">Register</a>
+
+          <div class="line-through">
+            <span>or</span>
+          </div>
+
+          <a href="#/auth/reset-password">Reset Password</a><br />
+          <a href="#/auth/unlock">Unlock Account</a><br />
+          <a href="#/auth/unlock-instructions">Account locked?</a><br />
+          <a href="#/auth/confirm">Confirm Account</a><br />
+          <a href="#/auth/confirmation-instructions">Request Confirmation Token</a><br />
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>

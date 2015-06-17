@@ -7,34 +7,87 @@ module.exports = function(grunt){
       assets: 'app/assets',
       css: 'app/assets/css',
       scss: 'app/assets/scss',
-      components: 'app/components'
-    },
-    sass: {
-      dist: {
-        files: {
-          '<%= project.css %>/application.css': '<%= project.scss %>/application.scss',
-          '<%= project.css %>/auth.css': '<%= project.scss %>/auth.scss',
-          '<%= project.css %>/shared.css': '<%= project.scss %>/shared.scss'
-        }
-      }
-    },
-    watch: {
-      css: {
-        files: '<%= project.scss %>/*.scss',
-        tasks: ['sass']
-      }
+      js: 'app/assets/js',
+      minjs: 'app/assets/minjs',
+      components: 'app/bower_components'
     },
     copy: {
       main: {
-            expand: true,
-            flatten: true,
-            src: '<%= project.components %>/bootstrap-sass/assets/fonts/bootstrap/*.*',
-            dest: '<%= project.assets %>/fonts/bootstrap/'
-          }
+        expand: true,
+        flatten: true,
+        src: '<%= project.components %>/bootstrap-sass/assets/fonts/bootstrap/*.*',
+        dest: '<%= project.assets %>/fonts/bootstrap/'
+      }
+    },
+    sass: {
+      options: {
+        sourcemap: 'none'
+      },
+      dist: {
+        files: [{
+          expand: true,
+          flatten: true,
+          ext: '.css',
+          src: ['<%= project.scss %>/*.scss'],
+          dest: '<%= project.css %>'
+        }]
+      }
+    },
+    cssmin: {
+      dist: {
+        files: [{
+          expand: true,
+          flatten: true,
+          ext: '.min.css',
+          src: '<%= project.css %>/*.css',
+          dest: '<%= project.css %>'
+        }]
+      },
+    },
+    jshint: {
+      all: {
+        src: [ 'Gruntfile.js', '<%= project.js %>/*.js' ]
+      }
+    },
+    uglify: {
+      options: {
+        mangle: 'sort',
+      },
+      js: {
+        files: [{
+          '<%= project.minjs %>/application.min.js': '<%= project.js %>/*.js'
+        }]
+      }
+    },
+    watch: {
+      copy: {
+        files: ['<%= project.components %>/bootstrap-sass/assets/fonts/bootstrap/*.*'],
+        tasks: ['newer:copy:main']
+      },
+      sass: {
+        files: '<%= project.scss %>/*.scss',
+        tasks: ['newer:sass:dist']
+      },
+      css: {
+        files: ['<%= project.css %>/*.css', '!<%= project.css %>/*.min.css'],
+        tasks: ['newer:cssmin:dist']
+      },
+      jshint: {
+        files: ['Gruntfile.js', '<%= project.js %>/*.js'],
+        tasks: ['newer:jshint:all']
+      },
+      js: {
+        files: '<%= project.js %>/*.js',
+        tasks: ['newer:uglify:js']
+      }
     }
   });
-  grunt.loadNpmTasks('grunt-contrib-sass');
-  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.registerTask('default',['copy', 'watch']);
-}
+  grunt.loadNpmTasks('grunt-contrib-sass');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-newer');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.registerTask('default',['newer:copy:main', 'newer:sass:dist', 'newer:cssmin:dist', 'newer:jshint:all', 'newer:uglify:js', 'watch']);
+};

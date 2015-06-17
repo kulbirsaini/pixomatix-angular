@@ -1,0 +1,9 @@
+<div class="alert alert-danger" ng-hide="!errors || errors.length === 0">
+  <p ng-repeat="error in errors">{{error}}</p>
+</div>
+<div class="alert alert-warning" ng-hide="!warnings || warnings.length === 0">
+  <ul><li ng-repeat="warning in warnings">{{warning}}</li></ul>
+</div>
+<div class="alert alert-info" ng-hide="!notices || notices.length === 0">
+  <p ng-repeat="notice in notices">{{notice}}</p>
+</div>

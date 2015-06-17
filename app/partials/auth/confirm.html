@@ -1,0 +1,32 @@
+<div class="container-fluid">
+  <div class="row devise-box">
+    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 column">
+      <h2 class="text-center">Pixomatix</h2>
+
+      <form class="form-horizontal confirm-form" novalidate="novalidate">
+        <fieldset>
+          <div ng-include="'partials/auth/notice.html'"></div>
+          <div class="form-group required" ng-hide="isEmailSet()">
+            <input class="required input-lg form-control round-top-corner" autofocus="autofocus" placeholder="Email" type="email" name="email" ng-model="email">
+          </div>
+          <div class="form-group required">
+            <input class="required input-lg form-control round-bottom-corner" ng-class="isEmailSet() ? 'round-top-corner' : ''" autofocus="autofocus" placeholder="Confirmation Token" type="text" name="confirmation_token" ng-model="confirmation_token">
+          </div>
+          <a class="btn btn-info btn-sign-up" ng-click="confirm()">Confirm</a>
+
+          <div class="line-through">
+            <span>or</span>
+          </div>
+
+          <a class="btn btn-danger btn-sign-in" href="#/auth/login">Login</a>
+
+          <div class="line-through">
+            <span>or</span>
+          </div>
+
+          <a class="btn btn-success btn-sign-up" href="#/auth/register">Register</a>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>
